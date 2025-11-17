@@ -1,7 +1,7 @@
 {
-  "name": "claude-multi-repo-agent",
+  "name": "codesweep",
   "version": "2.0.0",
-  "description": "Automated system for executing Claude Code tasks across multiple GitHub repositories",
+  "description": "CodeSweep - Automated system for executing Claude Code tasks across multiple GitHub repositories",
   "type": "module",
   "scripts": {
     "start": "zx gen-and-run-tasks.mjs",

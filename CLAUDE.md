@@ -1,10 +1,10 @@
-# Claude Multi-Repo Agent
+# CodeSweep
 
 This project provides an automated system for executing Claude Code tasks across multiple GitHub repositories simultaneously.
 
 ## Project Overview
 
-**Claude Multi-Repo Agent** is a universal automation toolkit that:
+**CodeSweep** is a universal automation toolkit that:
 - Executes tasks across multiple GitHub repositories and branches
 - **Uses git worktrees for true parallel execution** - even same repo, different branches can run concurrently
 - Automatically manages repository forks and clones
