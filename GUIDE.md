@@ -102,7 +102,7 @@ gh pr create \
 
 - Always target the upstream repository
 - Default base branch is `main` unless specified
-- Title must be concise and in English
+- Title must be concise and in English, and **must include the branch name in brackets at the end**, using the format: `<action> <summary> [<branch_name>]`. For example: `Fix dependency vulnerability and update CI config [release-2.1]`
 - Description should use markdown format with detailed reasoning
 - Use `$'...'` syntax for proper escape sequence handling
 - If the target repo has a pull request template, follow it.
