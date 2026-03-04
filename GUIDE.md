@@ -102,10 +102,16 @@ gh pr create \
 
 - Always target the upstream repository
 - Default base branch is `main` unless specified
-- Title must be concise and in English, and **must include the branch name in brackets at the end**, using the format: `<action> <summary> [<branch_name>]`. For example: `Fix dependency vulnerability and update CI config [release-2.1]`
+- **PR Title Format**: Before constructing the PR title, check the target repository's `.github` directory for any PR or commit title format requirements:
+  1. Check for contributing guidelines: `.github/CONTRIBUTING.md`, `CONTRIBUTING.md`
+  2. Check for PR title conventions in: `.github/pull_request_template.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/PULL_REQUEST_TEMPLATE/`
+  3. Check for commit message conventions: `.github/commitlint.config.js`, `.github/commitlint.config.ts`, `commitlint.config.js`, `commitlint.config.ts`, `.commitlintrc.json`, `.commitlintrc.yml`
+  4. Check for semantic PR title enforcement: `.github/semantic.yml`, `.github/workflows/` (look for PR title validation steps)
+  5. If any format requirements are found (e.g., Conventional Commits like `feat:`, `fix:`, `chore:`), follow that format and **append the branch name in brackets** at the end. For example: `feat: add support for new API endpoint [release-2.1]`
+  6. If no specific format requirements are found, use the default format: `<action> <summary> [<branch_name>]`. For example: `Fix dependency vulnerability and update CI config [release-2.1]`
 - Description should use markdown format with detailed reasoning
 - Use `$'...'` syntax for proper escape sequence handling
-- If the target repo has a pull request template, follow it.
+- If the target repo has a pull request template, follow it when constructing the PR body.
 
 ## Important Notes
 
