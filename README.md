@@ -1,6 +1,6 @@
 # CodeSweep
 
-A powerful automation toolkit that leverages Claude Code to execute tasks across multiple GitHub repositories simultaneously. Perfect for batch operations, code maintenance, and cross-repository updates. Built with modern JavaScript using [Google Zx](https://github.com/google/zx).
+A powerful automation toolkit that leverages AI coding agents to execute tasks across multiple GitHub repositories simultaneously. Supports [Claude Code](https://claude.ai/code) and [OpenCode](https://opencode.ai) as execution agents. Perfect for batch operations, code maintenance, and cross-repository updates. Built with modern JavaScript using [Google Zx](https://github.com/google/zx).
 
 ## ✨ Key Features
 
@@ -9,7 +9,7 @@ A powerful automation toolkit that leverages Claude Code to execute tasks across
 - 🍴 **Smart Fork Management**: Automatically forks and clones repositories if needed
 - 🎯 **Flexible Targeting**: Configure organizations, repositories, and branches with ease
 - 📦 **Bundle Support**: Organize task scenarios with predefined target/task combinations
-- 🤖 **Claude-Powered**: Leverages Claude Code for intelligent task execution
+- 🤖 **Multi-Agent Support**: Choose between Claude Code and OpenCode as execution agents
 - 📊 **Progress Tracking**: Comprehensive logging and execution summaries
 - 🚀 **One-Click Automation**: Generate and run tasks with a single command
 - 🌐 **Cross-Platform**: Works on macOS, Linux, and Windows
@@ -28,7 +28,7 @@ A powerful automation toolkit that leverages Claude Code to execute tasks across
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) 18.0.0 or higher
-- [Claude Code CLI](https://claude.ai/code) installed and authenticated
+- [Claude Code CLI](https://claude.ai/code) or [OpenCode CLI](https://opencode.ai) installed and authenticated
 - [GitHub CLI (`gh`)](https://cli.github.com/) installed and authenticated
 
 ### Installation
@@ -44,7 +44,7 @@ npm install
 # Verify installation
 node --version  # Should be 18.0+
 gh auth status
-claude --version
+claude --version   # or: opencode --version
 ```
 
 ### Your First Task
@@ -74,6 +74,9 @@ zx gen-and-run-tasks.mjs --bundle bundles/my-task --max-jobs 1
 
 # Higher parallelism for faster processing
 zx gen-and-run-tasks.mjs --bundle bundles/upgrade-deps --max-jobs 8
+
+# Use OpenCode as execution agent
+zx gen-and-run-tasks.mjs --bundle bundles/my-task --agent opencode
 
 # Step-by-step execution
 zx gen-and-run-tasks.mjs --bundle bundles/my-task --generate-only
@@ -141,9 +144,8 @@ Each bundle can have its own `config.json` to set default behavior:
 
 ```json
 {
-  "parallel": true,
   "maxJobs": 4,
-  "saveLogs": true,
+  "agent": "claude",
   "guideFile": "GUIDE.md"
 }
 ```
@@ -159,6 +161,7 @@ Each bundle can have its own `config.json` to set default behavior:
 | `--generate-only`   | Only generate task files, don't execute them                       |
 | `--run-only`        | Execute existing task files without regenerating                   |
 | `--max-jobs NUM`    | Concurrency limit (default: 4, use 1 for sequential)              |
+| `--agent NAME`      | Execution agent: `claude` or `opencode` (default: `claude`)        |
 | `--help, -h`        | Show help message                                                  |
 
 ## 📁 Project Structure
@@ -168,8 +171,13 @@ codesweep/
 ├── gen-and-run-tasks.mjs   # Main automation script
 ├── package.json            # Node.js dependencies
 ├── lib/                    # Core library modules
+│   ├── agents/            # Execution agent implementations
+│   │   ├── base.mjs       # Base agent interface
+│   │   ├── claude.mjs     # Claude Code agent
+│   │   ├── opencode.mjs   # OpenCode agent
+│   │   └── index.mjs      # Agent factory
 │   ├── config.mjs         # Configuration management
-│   ├── executor.mjs       # Task execution
+│   ├── executor.mjs       # Task execution (agent-agnostic)
 │   ├── repository.mjs     # Repository operations
 │   ├── taskgen.mjs        # Task file generation
 │   └── utils.mjs          # Utility functions
@@ -298,11 +306,16 @@ $.verbose = true;
 
 ```javascript
 lib/
+├── agents/         # Pluggable execution agents
+│   ├── base.mjs    # Base agent interface (detect, buildCommand)
+│   ├── claude.mjs  # Claude Code CLI agent
+│   ├── opencode.mjs # OpenCode CLI agent
+│   └── index.mjs   # Agent factory (createAgent)
 ├── config.mjs      # Configuration loading and validation
 ├── utils.mjs       # Formatting, parsing, utility functions
 ├── repository.mjs  # Git/GitHub repository management
 ├── taskgen.mjs     # Task file generation from YAML
-└── executor.mjs    # Sequential/parallel task execution
+└── executor.mjs    # Agent-agnostic task execution
 ```
 
 ### Error Handling
@@ -418,7 +431,7 @@ This tool is designed to be organization-agnostic and can work with any GitHub r
 - **Bundle Organization**: Create bundles for different scenarios (monthly updates, security patches, etc.)
 - **Team Sharing**: Commit bundle configurations for consistent task execution
 - **Task Automation**: Use for dependency updates, documentation syncing, compliance checks
-- **Performance Optimization**: Use `--parallel` for large repository sets
+- **Agent Selection**: Use `--agent opencode` for OpenCode or default to Claude Code
 - **Resource Management**: Start with lower `--max-jobs` and increase based on performance
 - **Safety First**: Parallel mode prevents Git conflicts by grouping tasks intelligently
 - **Configuration Hierarchy**: Root config for defaults, bundle configs for optimizations

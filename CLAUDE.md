@@ -1,6 +1,6 @@
 # CodeSweep
 
-This project provides an automated system for executing Claude Code tasks across multiple GitHub repositories simultaneously.
+This project provides an automated system for executing AI coding agent tasks across multiple GitHub repositories simultaneously. Supports both Claude Code and OpenCode as execution agents.
 
 ## Project Overview
 
@@ -10,14 +10,14 @@ This project provides an automated system for executing Claude Code tasks across
 - Automatically manages repository forks and clones
 - Organizes task scenarios using predefined bundles
 - Creates isolated worktree environments for each task
-- Leverages Claude Code for intelligent task execution
+- Supports multiple AI coding agents (Claude Code, OpenCode) for task execution
 - Built with modern JavaScript using Google's Zx framework
 
 ## Key Components
 
 ### Main Script
 - **Main script**: `gen-and-run-tasks.mjs`
-- **Requirements**: Node.js 18+, `gh` CLI, `claude` CLI
+- **Requirements**: Node.js 18+, `gh` CLI, `claude` CLI or `opencode` CLI
 - **Built-in features**: YAML/JSON parsing, colored output, intelligent concurrency control
 - **Documentation**: See [README-ZX.md](README-ZX.md), [QUICKSTART-ZX.md](QUICKSTART-ZX.md)
 
@@ -40,7 +40,7 @@ All tasks are organized using bundles. Each bundle is a directory containing:
   - Each task directory contains:
     - `<repo-name>/`: Git worktree with repository code on the specified branch
     - `task.md`: Task instructions and metadata at the root level
-    - `execution.log`: Claude Code execution output at the root level
+    - `execution.log`: Agent execution output at the root level
 
 ## Configuration Format
 
@@ -81,7 +81,7 @@ tasks/001_repo_branch/
   - Repository metadata (org, repo, branch, task directory, repository code path)
   - Workflow guide (from bundle's GUIDE.md if available, otherwise root GUIDE.md)
   - Task description (from bundle's task.md)
-- **execution.log**: Claude Code execution output (created after task execution)
+- **execution.log**: Agent execution output (created after task execution)
 
 ## Automation Workflow
 
@@ -95,7 +95,8 @@ tasks/001_repo_branch/
    - Each worktree is an independent working directory
    - Worktrees share the git metadata from the bare repository
    - Generates task.md file at task directory root level (outside worktree)
-3. **Task Execution**: Runs Claude Code in each repository subdirectory with configurable concurrency
+3. **Task Execution**: Runs the configured agent (Claude Code or OpenCode) in each repository subdirectory with configurable concurrency
+   - **Agent Selection**: Use `--agent claude` or `--agent opencode` to choose execution agent (default: `claude`)
    - **Concurrency Control**: Use `--max-jobs N` to control parallelism (default: 4)
    - **Sequential Mode**: Set `--max-jobs 1` for one-by-one execution
    - **Parallel Mode**: **All tasks can run concurrently** - no repo-level restrictions
@@ -149,6 +150,9 @@ zx gen-and-run-tasks.mjs --bundle bundles/my-task --guide-file custom-guide.md
 
 # Control concurrency (1 = sequential, higher = more parallel)
 zx gen-and-run-tasks.mjs --bundle bundles/my-task --max-jobs 8
+
+# Use OpenCode instead of Claude Code
+zx gen-and-run-tasks.mjs --bundle bundles/my-task --agent opencode
 ```
 
 ## Manual Intervention Workflow
@@ -185,12 +189,14 @@ One of the key benefits of the worktree architecture is the ability to manually 
      git commit -s -m "Fix issue"
      gh pr create ...
      ```
-   - Option B: Re-run Claude Code:
+   - Option B: Re-run the agent:
      ```bash
      # Go back to task directory
      cd ..
-     # Re-run with task.md
+     # Re-run with Claude Code
      cat task.md | claude -p "Execute this task" > execution.log 2>&1
+     # Or re-run with OpenCode
+     opencode run -f task.md "Execute this task" > execution.log 2>&1
      ```
 
 ### Benefits
@@ -229,7 +235,8 @@ Bundles can include any combination of these files:
   "maxJobs": 4,
   "generateOnly": false,
   "runOnly": false,
-  "guideFile": "GUIDE.md"
+  "guideFile": "GUIDE.md",
+  "agent": "claude"
 }
 ```
 
@@ -257,7 +264,7 @@ With this config, running `--bundle bundles/security-patch` would use:
 
 ## Requirements
 
-- **Claude Code CLI** (authenticated) - `claude --version`
+- **Claude Code CLI** (authenticated) - `claude --version`, OR **OpenCode CLI** - `opencode --version`
 - **GitHub CLI** `gh` (authenticated) - `gh auth status`
 - **Node.js** 18.0.0 or higher - `node --version`
 - **NPM** 9.0.0 or higher - `npm --version`
@@ -273,7 +280,7 @@ With this config, running `--bundle bundles/security-patch` would use:
 # Check requirements
 node --version  # Should be 18.0+
 gh auth status
-claude --version
+claude --version   # or: opencode --version
 
 # Install dependencies (first time only)
 npm install
@@ -282,10 +289,13 @@ npm install
 mkdir -p bundles/my-task
 # Add target.yml and task.md to the bundle directory
 
-# Run your first task
+# Run your first task (defaults to Claude Code agent)
 zx gen-and-run-tasks.mjs --bundle bundles/my-task
 # or
 npm start -- --bundle bundles/my-task
+
+# Use OpenCode as the execution agent
+zx gen-and-run-tasks.mjs --bundle bundles/my-task --agent opencode
 ```
 
 ## Documentation
